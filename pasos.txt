@@ -99,11 +99,94 @@ Archivo index.html dentro carpeta html:
 </body>
 </html>
 
-
+(((((((((((((((((((((((((((((())))))))))))))))))))))))))))))
+(((((((((((((((((((((((((((((())))))))))))))))))))))))))))))
 
 PARA UTILIZAR PLANTILLAS:
 pip install jinja2
+
+
+Archivo main.py:
+# from fastapi import FastAPI
+
+# Primera dorma
+
+# app=FastAPI()
+
+# @app.get("/")
+# def root():
+#     return "Hi,i am Fastapi"
+
+# SEGUNDA FORMA
+
+# from fastapi import FastAPI
+# from fastapi.responses import HTMLResponse
+
+# app=FastAPI()
+
+# @app.get("/",response_class=HTMLResponse)
+# def root():
+#     return """
+#         <html>
+#         <head>
+#             <title>Web FastAPI</title>
+#         </head>
+#         <body>
+#             <h1>Hi I a, a html file</h1>
+#         </body>
+#     </html>
+
+#     """
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+
+app=FastAPI()
+
+app.mount("/static",StaticFiles(directory="./static"),name="static")
+
+templates = Jinja2Templates(directory="./public/templates")
+
+
+# Ruta para archivos html
+@app.get("/",response_class=HTMLResponse)
+def root():
+    html_address = "./static/html/index.html"
+    return FileResponse(html_address,status_code=200)
+
+# Tercera forma:
+# Ruta para Jinja2
+@app.get("/template/{id}", response_class=HTMLResponse)
+def template(request: Request, id: str):
+    return templates.TemplateResponse("item.html", {"request": request, "id": id})
+
+Archivo en carpeta public dentro templartes y archivo item.html jinga2:
+<html>
+<head>
+    <title>Item Details</title>
+<link href="{{ url_for('static', path='/css/style.css') }}" rel="stylesheet"></head>
+<body>
+    <h1>Item ID: {{ id }}</h1>
+<script src="{{ url_for('static', path='/js/script.js') }}"></script></body>
+</html>
+
+ARCHIVO index.html dentro de html carpeta:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web FastAPI</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <h1>Hi I a, a html file</h1>
+    <script defer src="/static/js/script.js"></script>
+</body>
+</html>
+
+PARA utilizar templates item.html:
 http://127.0.0.1:8000/template/1000
 
-Voy minuto 24 de 31 creo carpeta templates y dentro item.html
-Voy minuto 29 mirar id me da error
